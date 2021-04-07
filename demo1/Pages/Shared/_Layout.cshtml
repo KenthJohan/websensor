@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+    
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+</head>
+<body style="background-color:burlywood">
+    
+
+
+    <nav>
+        <h3>Sidebar<br>Navigation</h3>
+        <a href="/">/</a>
+        <a href="Meter">Meter</a>
+        <a href="Plot">Plot</a>
+        <a href="Loader">Loader</a>
+    </nav>
+
+
+    <main>
+        @RenderBody()
+    </main>
+    
+    <div style="background-color:rebeccapurple; color:antiquewhite; font-weight:bold">
+        @RenderSection("Note",false)
+    </div>
+
+    
+
+    
+    <!-- Style -->
+    <style>
+        html, body
+        {
+            height: 100%;
+        }
+
+        body
+        {
+            display: flex;
+        }
+    
+        nav
+        {
+            padding: 10px;
+            background-color: darkgoldenrod;
+        }
+
+        nav > a
+        {
+            color: greenyellow;
+            display: block;
+        }
+
+        main
+        {
+            padding: 10px;
+            background-color: ghostwhite;
+            flex: 1;
+        }
+
+    </style>
+</body>
+</html>

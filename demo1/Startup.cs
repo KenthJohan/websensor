@@ -21,9 +21,11 @@ namespace demo1
             Console.WriteLine("ConfigureServices");
             Console.WriteLine("cwd: " + Directory.GetCurrentDirectory());
             Console.Out.Flush();
+            services.AddMvc();
             services.AddDirectoryBrowser();
             services.AddAuthorization();
-            services.AddControllers();
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
+            services.AddRazorPages().AddRazorRuntimeCompilation();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +62,7 @@ namespace demo1
                     await context.Response.WriteAsync("Hello World!");
                 });
                 endpoints.MapControllers();
+                endpoints.MapRazorPages();
             });
         }
     }
