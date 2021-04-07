@@ -4,13 +4,13 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
 </head>
-<body style="background-color:burlywood">
-    
-
+<body>
 
     <nav>
-        <h3>Sidebar<br>Navigation</h3>
+        <h1>The<br>Sidebar<br>Navigator</h1>
         <a href="/">/</a>
         <a href="Meter">Meter</a>
         <a href="Plot">Plot</a>
@@ -21,45 +21,6 @@
     <main>
         @RenderBody()
     </main>
-    
-    <div style="background-color:rebeccapurple; color:antiquewhite; font-weight:bold">
-        @RenderSection("Note",false)
-    </div>
 
-    
-
-    
-    <!-- Style -->
-    <style>
-        html, body
-        {
-            height: 100%;
-        }
-
-        body
-        {
-            display: flex;
-        }
-    
-        nav
-        {
-            padding: 10px;
-            background-color: darkgoldenrod;
-        }
-
-        nav > a
-        {
-            color: greenyellow;
-            display: block;
-        }
-
-        main
-        {
-            padding: 10px;
-            background-color: ghostwhite;
-            flex: 1;
-        }
-
-    </style>
 </body>
 </html>
