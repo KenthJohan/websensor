@@ -11,7 +11,8 @@ function swap32(val) {
 
 
 
-function load(filename, from, to, callback) {
+function load(filename, from, to, callback)
+{
 	var meter = document.getElementById('value1');
 	console.log("Loading file: " + filename);
 	var xhr = new XMLHttpRequest();
@@ -41,8 +42,9 @@ function load(filename, from, to, callback) {
 		console.log(z);
 		callback(x, y, z);
 	};
-	xhr.onerror = function (e) {
-		console.log(e);
+	xhr.onerror = function (e)
+	{
+		console.error(e);
 	};
 	xhr.send();
 }
@@ -54,6 +56,25 @@ function load(filename, from, to, callback) {
 
 
 
+
+function load_layout(filename, callback)
+{
+	console.log("Loading file: " + filename);
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", filename, true);
+	xhr.onload = function (e)
+	{
+		//console.log(xhr.responseText);
+		var obj = JSON.parse(xhr.responseText);
+		//console.log(obj);
+		callback(obj);
+	};
+	xhr.onerror = function (e)
+	{
+		console.error(e);
+	};
+	xhr.send();
+}
 
 
 

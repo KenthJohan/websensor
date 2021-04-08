@@ -34,3 +34,16 @@ main
 	background-color: ghostwhite;
 	flex: 1;
 }
+
+
+table
+{
+	border-collapse: collapse;
+	background-color: rgb(215, 231, 255);
+}
+
+td
+{
+	padding: 5px;
+	border: 1px solid black;
+}

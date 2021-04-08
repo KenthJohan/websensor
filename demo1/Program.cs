@@ -17,6 +17,7 @@ namespace demo1
         public static void DoWork()
         {
 			var rand = new Random();
+			const string fileName = "/data/test/temperature";
             for (int i = 0; i < 3; i++)
             {
                 Console.WriteLine("Working thread...");
