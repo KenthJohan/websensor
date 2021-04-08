@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -12,8 +13,23 @@ namespace demo1
 {
     public class Program
     {
+
+        public static void DoWork()
+        {
+			var rand = new Random();
+            for (int i = 0; i < 3; i++)
+            {
+                Console.WriteLine("Working thread...");
+                Thread.Sleep(100);
+            }
+        }
+
+
         public static void Main(string[] args)
         {
+            Thread thread1 = new Thread(DoWork);
+            thread1.Start();
+
             CreateHostBuilder(args).Build().Run();
         }
 

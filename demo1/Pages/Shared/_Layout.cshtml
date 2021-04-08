@@ -1,28 +1,34 @@
 <!DOCTYPE html>
-    
+
 <html>
+
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>@ViewBag.Title</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
-    <script src='scripts.js'></script>
+	<meta name="viewport" content="width=device-width" />
+	<title>@ViewBag.Title</title>
+	<link rel="stylesheet" href="styles.css">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+	<script src='scripts.js'></script>
 </head>
+
 <body>
 
-    <nav>
-        <h1>The<br>Sidebar<br>Navigator</h1>
-        <a href="/">/</a>
-        <a href="Meter">Meter</a>
-        <a href="Plot">Plot</a>
-        <a href="Loader">Loader</a>
-        <a href="Pointcloud">Pointcloud</a>
-    </nav>
+	<nav>
+		<h4>The<br>Sidebar<br>Navigator</h4>
+		<a href="/">Home</a>
+		<a href="Meter">Meter</a>
+		<a href="Plot">Plot</a>
+		<a href="Loader">Loader</a>
+		<a href="Pointcloud">Pointcloud</a>
+		<a href="OSM">OSM</a>
+	</nav>
 
 
-    <main>
-        @RenderBody()
-    </main>
+	<main>
+		@RenderBody()
+	</main>
 
 </body>
+
 </html>
