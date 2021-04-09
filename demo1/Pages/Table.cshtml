@@ -3,6 +3,7 @@
 
 <button onclick="test()">Load layout</button>
 <button onclick="test1()">Load layout</button>
+<button onclick="test2()">Load layout</button>
 <hr>
 <table id="table">
 
@@ -74,7 +75,7 @@ function generate_layout_table1(etable, x, y)
 function test()
 {
 	var etable = document.getElementById("table");
-	load_layout('data/miloatv/temperature.json', (x) => 
+	req_json('data/miloatv/temperature.json', (x) => 
 	{
 		generate_layout_table(etable, x);
 	});
@@ -83,9 +84,19 @@ function test()
 function test1()
 {
 	var etable = document.getElementById("table");
-	load_layout('data/miloatv/p1.json', (x) => 
+	req_json('data/miloatv/p1.json', (x) => 
 	{
 		generate_layout_table(etable, x);
+	});
+}
+
+
+
+function test2()
+{
+	req_json('projects', (x) => 
+	{
+		console.log(x);
 	});
 }
 </script>
