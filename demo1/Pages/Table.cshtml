@@ -22,6 +22,8 @@ function generate_htmltable_archetypes(etable, archetypes)
 	cell = row.insertCell(-1);
 	cell.innerHTML = "quantity";
 	cell = row.insertCell(-1);
+	cell.innerHTML = "n";
+	cell = row.insertCell(-1);
 	cell.innerHTML = "offset";
 	cell = row.insertCell(-1);
 	cell.innerHTML = "size";
@@ -39,6 +41,8 @@ function generate_htmltable_archetypes(etable, archetypes)
 			cell = row.insertCell(-1);
 			cell.innerHTML = layouts[j].quantity;
 			cell = row.insertCell(-1);
+			cell.innerHTML = layouts[j].n;
+			cell = row.insertCell(-1);
 			cell.innerHTML = layouts[j].offset;
 			cell = row.insertCell(-1);
 			cell.innerHTML = layouts[j].size;
@@ -52,32 +56,44 @@ function generate_htmltable_archetypes(etable, archetypes)
 
 
 var converters = {};
-converters["timestamp"] = function(view, offset)
+converters["timestamp"] = function(view)
 {
 	var r;
-	r = view.getFloat32(offset+0, false);
+	r = view.getFloat64(0, true);
 	return JSON.stringify(r);
 }
-converters["position_gcs"] = function(view, offset)
+converters["position_gcs"] = function(view)
 {
 	var r = [];
-	r[0] = view.getFloat32(offset+0, true);
-	r[1] = view.getFloat32(offset+4, true);
+	r[0] = view.getFloat32(0, true);
+	r[1] = view.getFloat32(4, true);
 	return JSON.stringify(r);
 }
-converters["temperature"] = function(view, offset)
+converters["temperature"] = function(view)
 {
 	var r;
-	r = view.getFloat32(offset+0, true);
+	r = view.getFloat32(0, true);
 	return JSON.stringify(r);
 }
-converters["humidity"] = function(view, offset)
+converters["humidity"] = function(view)
 {
 	var r;
-	r = view.getFloat32(offset+0, true);
+	r = view.getFloat32(0, true);
 	return JSON.stringify(r);
 }
 
+
+//https://www.hardill.me.uk/wordpress/2014/08/29/unpacking-binary-data-from-mqtt-in-javascript/
+function fluff(payload)
+{
+	var buffer = new ArrayBuffer(payload.length);
+	uint = new Uint8Array(buffer);
+	for (var i=0; i < payload.length; i++)
+	{
+		uint[i] = payload[i];
+	}
+	return uint;
+}
 
 
 function show_archetypes()
@@ -104,17 +120,19 @@ function show_archetypes()
 
 		client.on("message", function (topic, payload)
 		{
-			//console.log(topic);
-			console.log(payload.buffer);
-			dataview = new DataView(payload.buffer);
+			console.log(payload);
+			//console.log(fluff(payload));
+			//dataview = new DataView(fluff(payload).buffer);
 			var layouts = archetypes[topic].layouts;
 			for (name in layouts)
 			{
 				//console.log(name);
 				var offset = layouts[name].offset;
+				//Warning! The payload does not start at byte 0!
+				dataview = new DataView(payload.buffer, payload.byteOffset + offset);
 				//console.log(name, offset);
 				var cell = layouts[name]._cell;
-				var s = converters[name](dataview, offset);
+				var s = converters[name](dataview);
 				//console.log(s);
 				cell.innerHTML = s;
 			}

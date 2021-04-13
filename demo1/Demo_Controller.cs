@@ -35,6 +35,7 @@ namespace demo1
 	{
 		public int offset { get; set; }
 		public int size { get; set; }
+		public int n { get; set; }
 		public string quantity { get; set; }
 	}
 
