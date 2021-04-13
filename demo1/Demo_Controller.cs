@@ -33,15 +33,14 @@ namespace demo1
 
 	public class Layout
 	{
-		public string name { get; set; }
 		public int offset { get; set; }
 		public int size { get; set; }
+		public string quantity { get; set; }
 	}
 
 	public class Door
 	{
-		public string name { get; set; }
-		public List<Layout> layouts { get; set; }
+		public Dictionary<string,Layout> layouts { get; set; }
 	}
 
 	public class Demo_Controller : Controller
@@ -81,19 +80,19 @@ namespace demo1
 		[HttpGet("/doors")]
 		public async Task<IActionResult> doors()
 		{
-			List<Door> doors = new List<Door>();
+			Dictionary<string,Door> doors = new Dictionary<string,Door>();
 			string path = Path.Combine(Directory.GetCurrentDirectory(), "data");
 			List<string> names = new List<string>(Directory.EnumerateFiles(path, "*.json"));
 			for (var i = 0; i < names.Count; ++i)
 			{
 				Door door = new Door();
-				door.name = Path.GetFileNameWithoutExtension(names[i]);
+				string name = Path.GetFileNameWithoutExtension(names[i]);
 				string content = System.IO.File.ReadAllText(names[i]);
-				door.layouts = JsonSerializer.Deserialize<List<Layout>>(content);
-				doors.Add(door);
+				door.layouts = JsonSerializer.Deserialize<Dictionary<string,Layout>>(content);
+				doors[name] = door;
 				//Console.WriteLine(names[i]);
 			}
-			string s = JsonSerializer.Serialize<List<Door>>(doors);
+			string s = JsonSerializer.Serialize<Dictionary<string,Door>>(doors);
 			return Content(s, "application/json");
 		}
 

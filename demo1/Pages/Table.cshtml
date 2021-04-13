@@ -1,9 +1,7 @@
 @page "/Table"
 <h1>Table</h1>
 
-<button onclick="test()">Load layout</button>
-<button onclick="test1()">Load layout</button>
-<button onclick="test2()">Load layout</button>
+<button onclick="show_archetypes()">show_archetypes</button>
 <hr>
 <table id="table">
 
@@ -11,92 +9,117 @@
 
 <script>
 
-function generate_layout_table(etable, x)
-{
-	var cell;
-	var row;
-	etable.innerHTML = "";
-	row = etable.insertRow(-1);
-	cell = row.insertCell(-1);
-	cell.innerHTML = "quantity";
-	cell = row.insertCell(-1);
-	cell.innerHTML = "type";
-	cell = row.insertCell(-1);
-	cell.innerHTML = "offset";
-	cell = row.insertCell(-1);
-	cell.innerHTML = "stride";
-	for (i in x)
-	{
-		//console.log(i);
-		row = etable.insertRow(-1);
-		cell = row.insertCell(-1);
-		cell.innerHTML = x[i].quantity;
-		cell = row.insertCell(-1);
-		cell.innerHTML = x[i].type;
-		cell = row.insertCell(-1);
-		cell.innerHTML = x[i].offset;
-		cell = row.insertCell(-1);
-		cell.innerHTML = x[i].stride;
-	}
-	//var row = etable.insertRow(0);
-}
 
 
-function generate_layout_table1(etable, x, y)
+
+function generate_htmltable_archetypes(etable, archetypes)
 {
 	var cell;
 	var row;
 	row = etable.insertRow(-1);
 	cell = row.insertCell(-1);
-	cell.innerHTML = "quantity";
+	cell.innerHTML = "name";
 	cell = row.insertCell(-1);
-	cell.innerHTML = "type";
+	cell.innerHTML = "quantity";
 	cell = row.insertCell(-1);
 	cell.innerHTML = "offset";
 	cell = row.insertCell(-1);
-	cell.innerHTML = "stride";
-	for (i in x)
+	cell.innerHTML = "size";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "value";
+	for (name in archetypes)
 	{
+		var layouts = archetypes[name].layouts;
 		//console.log(i);
-		row = etable.insertRow(-1);
-		cell = row.insertCell(-1);
-		cell.innerHTML = x[i].quantity;
-		cell = row.insertCell(-1);
-		cell.innerHTML = x[i].type;
-		cell = row.insertCell(-1);
-		cell.innerHTML = x[i].offset;
-		cell = row.insertCell(-1);
-		cell.innerHTML = x[i].stride;
+		for (j in layouts)
+		{
+			row = etable.insertRow(-1);
+			cell = row.insertCell(-1);
+			cell.innerHTML = name;
+			cell = row.insertCell(-1);
+			cell.innerHTML = layouts[j].quantity;
+			cell = row.insertCell(-1);
+			cell.innerHTML = layouts[j].offset;
+			cell = row.insertCell(-1);
+			cell.innerHTML = layouts[j].size;
+			cell = row.insertCell(-1);
+			cell.innerHTML = 0;
+			layouts[j]._cell = cell;
+		}
 	}
 	//var row = etable.insertRow(0);
 }
 
 
-function test()
+var converters = {};
+converters["timestamp"] = function(view, offset)
 {
-	var etable = document.getElementById("table");
-	req_json('data/miloatv/temperature.json', (x) => 
-	{
-		generate_layout_table(etable, x);
-	});
+	var r;
+	r = view.getFloat32(offset+0, false);
+	return JSON.stringify(r);
+}
+converters["position_gcs"] = function(view, offset)
+{
+	var r = [];
+	r[0] = view.getFloat32(offset+0, true);
+	r[1] = view.getFloat32(offset+4, true);
+	return JSON.stringify(r);
+}
+converters["temperature"] = function(view, offset)
+{
+	var r;
+	r = view.getFloat32(offset+0, true);
+	return JSON.stringify(r);
+}
+converters["humidity"] = function(view, offset)
+{
+	var r;
+	r = view.getFloat32(offset+0, true);
+	return JSON.stringify(r);
 }
 
-function test1()
+
+
+function show_archetypes()
 {
+	var client = mqtt.connect("ws://192.168.1.195:1884");
+	client.on('connect', function () 
+	{
+		console.log("mqtt connected");
+	})
+
+
+
+
 	var etable = document.getElementById("table");
-	req_json('data/miloatv/p1.json', (x) => 
+	req_json('doors', (archetypes) => 
 	{
-		generate_layout_table(etable, x);
-	});
-}
+		generate_htmltable_archetypes(etable, archetypes);
+		console.log(archetypes);
+		for (topic in archetypes)
+		{
+			console.log("subscribe: " + topic);
+			client.subscribe(topic);
+		}
 
+		client.on("message", function (topic, payload)
+		{
+			//console.log(topic);
+			console.log(payload.buffer);
+			dataview = new DataView(payload.buffer);
+			var layouts = archetypes[topic].layouts;
+			for (name in layouts)
+			{
+				//console.log(name);
+				var offset = layouts[name].offset;
+				//console.log(name, offset);
+				var cell = layouts[name]._cell;
+				var s = converters[name](dataview, offset);
+				//console.log(s);
+				cell.innerHTML = s;
+			}
+		});
 
-
-function test2()
-{
-	req_json('projects', (x) => 
-	{
-		console.log(x);
 	});
 }
 </script>
