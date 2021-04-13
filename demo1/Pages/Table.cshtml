@@ -81,6 +81,15 @@ converters["humidity"] = function(view)
 	r = view.getFloat32(0, true);
 	return JSON.stringify(r);
 }
+converters["position_xyzw"] = function(view)
+{
+	var r = [];
+	r[0] = view.getFloat32(0, true);
+	r[1] = view.getFloat32(4, true);
+	r[2] = view.getFloat32(8, true);
+	r[3] = view.getFloat32(12, true);
+	return JSON.stringify(r);
+}
 
 
 //https://www.hardill.me.uk/wordpress/2014/08/29/unpacking-binary-data-from-mqtt-in-javascript/
