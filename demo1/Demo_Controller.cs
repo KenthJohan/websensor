@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Web;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
 using System.Text.Json;
@@ -21,6 +22,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 
+using MQTTnet;
+using MQTTnet.Client;
+using MQTTnet.Client.Connecting;
+using MQTTnet.Client.Options;
+using MQTTnet.Formatter;
 
 namespace demo1
 {
@@ -64,7 +70,7 @@ namespace demo1
 		{
 			string path = Path.Combine(Directory.GetCurrentDirectory(), "data");
 			List<string> dirs = new List<string>(Directory.EnumerateDirectories(path));
-			for(var i = 0; i < dirs.Count; ++i)
+			for (var i = 0; i < dirs.Count; ++i)
 			{
 				dirs[i] = dirs[i].Substring(dirs[i].LastIndexOf(Path.DirectorySeparatorChar) + 1);
 			}
@@ -78,7 +84,7 @@ namespace demo1
 			List<Door> doors = new List<Door>();
 			string path = Path.Combine(Directory.GetCurrentDirectory(), "data");
 			List<string> names = new List<string>(Directory.EnumerateFiles(path, "*.json"));
-			for(var i = 0; i < names.Count; ++i)
+			for (var i = 0; i < names.Count; ++i)
 			{
 				Door door = new Door();
 				door.name = Path.GetFileNameWithoutExtension(names[i]);
@@ -89,6 +95,21 @@ namespace demo1
 			}
 			string s = JsonSerializer.Serialize<List<Door>>(doors);
 			return Content(s, "application/json");
+		}
+
+
+		[HttpGet("/mqtt/connect")]
+		public async Task<IActionResult> mqtt_connect()
+		{
+			string host = "192.168.1.195";
+			int port = 1883;
+			var options = new MqttClientOptionsBuilder()
+				.WithTcpServer(host, port)
+				//.WithCredentials(txtUsername.Text, txtPassword.Text)
+				.WithProtocolVersion(MqttProtocolVersion.V311)
+				.Build();
+			var auth = await Program.mqtt_client.ConnectAsync(options);
+			return Content(auth.ResultCode.ToString(), "text/html");
 		}
 
 

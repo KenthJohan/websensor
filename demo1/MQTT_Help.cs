@@ -40,47 +40,8 @@ using Microsoft.Extensions.Logging;
 
 namespace demo1
 {
-	public class Program
+	public class MQTT_Help
 	{
-
-		public static IMqttClient mqtt_client { get; set; }
-
-
-		public static void Main(string[] args)
-		{
-			mqtt_client = new MqttFactory().CreateMqttClient();
-			CreateHostBuilder(args).Build().Run();
-		}
-
-		public static IHostBuilder CreateHostBuilder(string[] args)
-		{
-			return Host.CreateDefaultBuilder(args)
-				.ConfigureWebHostDefaults(webBuilder =>
-				{
-					webBuilder.UseStartup<Startup>();
-				});
-		}
-
-		//Must of the configurations depends heavily on environment variables 
-		//so we use this function to help deployers to know if a environment variable is missing:
-		static public void require_environment_variable(string name)
-		{
-			if (Environment.GetEnvironmentVariable(name) == null)
-			{
-				Console.WriteLine("Missing environment variable: " + name + "");
-				Environment.Exit(1);
-			}
-		}
-
-
-
-
-
 	}
-
-
-
-
-
 
 }
