@@ -1,0 +1,26 @@
+@page "/MQTT"
+<h1>MQTT</h1>
+
+
+<script>
+	var client = mqtt.connect("ws://192.168.1.195:1884")
+	client.subscribe("mqtt/demo")
+	client.subscribe("f32counter")
+
+	client.on('connect', function () 
+	{
+		console.log("mqtt connected");
+	})
+
+	var i = 0;
+	client.on("message", function (topic, payload)
+	{
+		i++;
+		console.log(payload);
+		//alert([topic, payload].join(": "))
+	})
+
+	client.publish("/hello", "hello world!")
+</script>
+
+

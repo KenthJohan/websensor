@@ -1,0 +1,60 @@
+@page "/Plot"
+<h1>Plot</h1>
+
+<meter id="value1" min="0" max="100" low="30" high="75" optimum="80" value="25"></meter>
+<button onclick="test1()">Load</button>
+<div id="myDiv"></div>
+
+
+<script>
+/*
+var trace1 = {
+	x: [1, 2, 3],
+	y: [4, 5, 6],
+	type: 'scatter'
+};
+
+var trace2 = {
+	x: [20, 30, 40],
+	y: [50, 60, 70],
+	xaxis: 'x2',
+	yaxis: 'y2',
+	type: 'scatter'
+};
+
+var data = [trace1, trace2];
+
+var layout = {
+	grid: {rows: 1, columns: 2, pattern: 'independent'},
+};
+
+Plotly.newPlot('myDiv', data, layout);
+*/
+
+
+function test1()
+{
+	var frame = 100;
+	var framesize = (320 * 20) * (4 * 4);
+
+	req_arraybuffer('/data/miloatv/p1.out', frame * framesize, (frame + 1) * framesize - 1, (x, y, z) => {
+		var xx = new Float32Array(x.length);
+		for (var i = 0; i < xx.length; i++) {
+			xx[i] = i;
+		}
+		var trace1 =
+		{
+			x: xx,
+			y: x,
+			type: 'scatter'
+		};
+		var layout =
+		{
+			grid: { rows: 1, columns: 2, pattern: 'independent' },
+		};
+		Plotly.newPlot('myDiv', [trace1], layout);
+	});
+}
+
+
+</script>

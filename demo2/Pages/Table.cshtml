@@ -1,0 +1,102 @@
+@page "/Table"
+<h1>Table</h1>
+
+<button onclick="test()">Load layout</button>
+<button onclick="test1()">Load layout</button>
+<button onclick="test2()">Load layout</button>
+<hr>
+<table id="table">
+
+</table>
+
+<script>
+
+function generate_layout_table(etable, x)
+{
+	var cell;
+	var row;
+	etable.innerHTML = "";
+	row = etable.insertRow(-1);
+	cell = row.insertCell(-1);
+	cell.innerHTML = "quantity";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "type";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "offset";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "stride";
+	for (i in x)
+	{
+		//console.log(i);
+		row = etable.insertRow(-1);
+		cell = row.insertCell(-1);
+		cell.innerHTML = x[i].quantity;
+		cell = row.insertCell(-1);
+		cell.innerHTML = x[i].type;
+		cell = row.insertCell(-1);
+		cell.innerHTML = x[i].offset;
+		cell = row.insertCell(-1);
+		cell.innerHTML = x[i].stride;
+	}
+	//var row = etable.insertRow(0);
+}
+
+
+function generate_layout_table1(etable, x, y)
+{
+	var cell;
+	var row;
+	row = etable.insertRow(-1);
+	cell = row.insertCell(-1);
+	cell.innerHTML = "quantity";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "type";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "offset";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "stride";
+	for (i in x)
+	{
+		//console.log(i);
+		row = etable.insertRow(-1);
+		cell = row.insertCell(-1);
+		cell.innerHTML = x[i].quantity;
+		cell = row.insertCell(-1);
+		cell.innerHTML = x[i].type;
+		cell = row.insertCell(-1);
+		cell.innerHTML = x[i].offset;
+		cell = row.insertCell(-1);
+		cell.innerHTML = x[i].stride;
+	}
+	//var row = etable.insertRow(0);
+}
+
+
+function test()
+{
+	var etable = document.getElementById("table");
+	req_json('data/miloatv/temperature.json', (x) => 
+	{
+		generate_layout_table(etable, x);
+	});
+}
+
+function test1()
+{
+	var etable = document.getElementById("table");
+	req_json('data/miloatv/p1.json', (x) => 
+	{
+		generate_layout_table(etable, x);
+	});
+}
+
+
+
+function test2()
+{
+	req_json('projects', (x) => 
+	{
+		console.log(x);
+	});
+}
+</script>

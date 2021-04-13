@@ -1,0 +1,49 @@
+html, body
+{
+	height: 100%;
+}
+
+*
+{
+	box-sizing: border-box;
+}
+  
+
+body
+{
+	display: flex;
+	background-color:burlywood;
+	overflow:hidden;
+}
+
+nav
+{
+	padding: 10px;
+	background-color: darkgoldenrod;
+}
+
+nav > a
+{
+	color: greenyellow;
+	display: block;
+}
+
+main
+{
+	padding: 10px;
+	background-color: ghostwhite;
+	flex: 1;
+}
+
+
+table
+{
+	border-collapse: collapse;
+	background-color: rgb(215, 231, 255);
+}
+
+td
+{
+	padding: 5px;
+	border: 1px solid black;
+}
