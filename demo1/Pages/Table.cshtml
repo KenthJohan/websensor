@@ -10,7 +10,10 @@
 <script>
 
 
-
+function hej(name, j)
+{
+	console.log(name, j);
+}
 
 function generate_htmltable_archetypes(etable, archetypes)
 {
@@ -29,17 +32,18 @@ function generate_htmltable_archetypes(etable, archetypes)
 	cell.innerHTML = "size";
 	cell = row.insertCell(-1);
 	cell.innerHTML = "value";
-	for (name in archetypes)
+	for (let name in archetypes)
 	{
 		var layouts = archetypes[name].layouts;
 		//console.log(i);
-		for (j in layouts)
+		for (let j in layouts)
 		{
 			row = etable.insertRow(-1);
 			cell = row.insertCell(-1);
 			cell.innerHTML = name;
 			cell = row.insertCell(-1);
 			cell.innerHTML = layouts[j].quantity;
+			cell.classList.add(layouts[j].quantity);
 			cell = row.insertCell(-1);
 			cell.innerHTML = layouts[j].n;
 			cell = row.insertCell(-1);
@@ -49,6 +53,12 @@ function generate_htmltable_archetypes(etable, archetypes)
 			cell = row.insertCell(-1);
 			cell.innerHTML = 0;
 			layouts[j]._cell = cell;
+			/*
+			cell.onclick = () => 
+			{
+				hej(name, j);
+			}
+			*/
 		}
 	}
 	//var row = etable.insertRow(0);
@@ -105,13 +115,21 @@ function fluff(payload)
 }
 
 
+
+
+function plotter(quantity, value)
+{
+
+}
+
+
 function show_archetypes()
 {
 	var client = mqtt.connect("ws://192.168.1.195:1884");
 	client.on('connect', function () 
 	{
 		console.log("mqtt connected");
-	})
+	});
 
 
 
@@ -127,22 +145,31 @@ function show_archetypes()
 			client.subscribe(topic);
 		}
 
+		for (name in archetypes)
+		{
+			var layouts = archetypes[name].layouts;
+			for (component in layouts)
+			{
+				let cell = layouts[component]._cell;
+				cell.onclick = () => 
+				{
+					cell.classList.toggle("selected");
+				}
+			}
+		}
+
 		client.on("message", function (topic, payload)
 		{
 			console.log(payload);
 			//console.log(fluff(payload));
 			//dataview = new DataView(fluff(payload).buffer);
 			var layouts = archetypes[topic].layouts;
-			for (name in layouts)
+			for (component in layouts)
 			{
-				//console.log(name);
-				var offset = layouts[name].offset;
 				//Warning! The payload does not start at byte 0!
-				dataview = new DataView(payload.buffer, payload.byteOffset + offset);
-				//console.log(name, offset);
-				var cell = layouts[name]._cell;
-				var s = converters[name](dataview);
-				//console.log(s);
+				dataview = new DataView(payload.buffer, payload.byteOffset + layouts[component].offset);
+				var s = converters[component](dataview);
+				var cell = layouts[component]._cell;
 				cell.innerHTML = s;
 			}
 		});

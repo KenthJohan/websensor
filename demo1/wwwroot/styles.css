@@ -39,11 +39,50 @@ main
 table
 {
 	border-collapse: collapse;
-	background-color: rgb(215, 231, 255);
+	background-color: rgb(255, 255, 255);
+	font-family: Consolas,monaco,monospace;
+	font-style: normal;
+	font-size: 14px;
+	/*
+	text-align: right;
+	*/
 }
 
 td
 {
 	padding: 5px;
 	border: 1px solid black;
+}
+
+
+
+.timestamp
+{
+	background-color: rgb(150, 160, 221);
+}
+
+.position_xyzw
+{
+	background-color: rgb(212, 150, 202);
+}
+
+.position_gcs
+{
+	background-color: rgb(143, 211, 169);
+}
+
+.temperature
+{
+	background-color: rgb(255, 151, 151);
+}
+
+.humidity
+{
+	background-color: rgb(174, 252, 255);
+}
+
+
+.selected
+{
+	background-color: rgb(238, 255, 0);
 }
