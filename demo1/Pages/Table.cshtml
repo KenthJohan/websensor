@@ -55,6 +55,7 @@ function generate_htmltable_archetypes(etable, archetypes)
 			cell.innerHTML = components[j].endian;
 			cell = row.insertCell(-1);
 			cell.innerHTML = 0;
+			cell.classList.add(components[j].quantity);
 			components[j]._cell = cell;
 			/*
 			cell.onclick = () => 
@@ -110,7 +111,7 @@ function plotter(archetypes)
 {
 
 	var traces = [];
-
+	var traceindex = 0;
 	for (archetype in archetypes)
 	{
 		var components = archetypes[archetype].components;
@@ -119,11 +120,15 @@ function plotter(archetypes)
 			let cell = components[component]._cell;
 			if (cell.classList.contains("selected"))
 			{
+				var bg = window.getComputedStyle( cell ,null).getPropertyValue('background-color');
+				console.log(bg);
+				components[component]._traceindex = traceindex;
+				traceindex++;
 				var trace = 
 				{
-					y: [1,2,3],
+					y: [],
 					mode: 'lines',
-					line: {color: '#80CAF6'}
+					line: {color: bg}
 				};
 				traces.push(trace);
 			}
@@ -141,9 +146,6 @@ function show_archetypes()
 	{
 		console.log("mqtt connected");
 	});
-
-
-
 
 	var etable = document.getElementById("table");
 
@@ -174,8 +176,8 @@ function show_archetypes()
 
 		client.on("message", function (topic, payload)
 		{
-			var valuesy = [];
-			var values0 = [];
+			var traceval = [];
+			var traceidx = [];
 			console.log(payload);
 			//console.log(fluff(payload));
 			//dataview = new DataView(fluff(payload).buffer);
@@ -189,17 +191,18 @@ function show_archetypes()
 				cell.innerHTML = JSON.stringify(s);
 				if (cell.classList.contains("selected"))
 				{
-					Plotly.extendTraces('myDiv', {y: [[s]]}, [0]);
+					traceval.push([s]);
+					traceidx.push(components[component]._traceindex);
 					//valuesy.push([s]);
 					//valuesy.push([s]);
 				}
+				if (traceval.length > 0)
+				{
+					console.log(traceval, traceidx);
+					Plotly.extendTraces('myDiv', {y: traceval}, traceidx);
+				}
 			}
-
-
-
-
 		});
-
 	});
 }
 
