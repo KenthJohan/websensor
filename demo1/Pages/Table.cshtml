@@ -3,9 +3,8 @@
 
 <button onclick="show_archetypes()">show_archetypes</button>
 <hr>
-<table id="table">
-
-</table>
+<table id="table"></table>
+<div id="myDiv"></div>
 
 <script>
 
@@ -31,28 +30,32 @@ function generate_htmltable_archetypes(etable, archetypes)
 	cell = row.insertCell(-1);
 	cell.innerHTML = "size";
 	cell = row.insertCell(-1);
+	cell.innerHTML = "endian";
+	cell = row.insertCell(-1);
 	cell.innerHTML = "value";
-	for (let name in archetypes)
+	for (let archetype in archetypes)
 	{
-		var layouts = archetypes[name].layouts;
+		var components = archetypes[archetype].components;
 		//console.log(i);
-		for (let j in layouts)
+		for (let j in components)
 		{
 			row = etable.insertRow(-1);
 			cell = row.insertCell(-1);
-			cell.innerHTML = name;
+			cell.innerHTML = archetype;
 			cell = row.insertCell(-1);
-			cell.innerHTML = layouts[j].quantity;
-			cell.classList.add(layouts[j].quantity);
+			cell.innerHTML = components[j].quantity;
+			cell.classList.add(components[j].quantity);
 			cell = row.insertCell(-1);
-			cell.innerHTML = layouts[j].n;
+			cell.innerHTML = components[j].n;
 			cell = row.insertCell(-1);
-			cell.innerHTML = layouts[j].offset;
+			cell.innerHTML = components[j].offset;
 			cell = row.insertCell(-1);
-			cell.innerHTML = layouts[j].size;
+			cell.innerHTML = components[j].size;
+			cell = row.insertCell(-1);
+			cell.innerHTML = components[j].endian;
 			cell = row.insertCell(-1);
 			cell.innerHTML = 0;
-			layouts[j]._cell = cell;
+			components[j]._cell = cell;
 			/*
 			cell.onclick = () => 
 			{
@@ -70,26 +73,26 @@ converters["timestamp"] = function(view)
 {
 	var r;
 	r = view.getFloat64(0, true);
-	return JSON.stringify(r);
+	return r;
 }
 converters["position_gcs"] = function(view)
 {
 	var r = [];
 	r[0] = view.getFloat32(0, true);
 	r[1] = view.getFloat32(4, true);
-	return JSON.stringify(r);
+	return r;
 }
 converters["temperature"] = function(view)
 {
 	var r;
 	r = view.getFloat32(0, true);
-	return JSON.stringify(r);
+	return r;
 }
 converters["humidity"] = function(view)
 {
 	var r;
 	r = view.getFloat32(0, true);
-	return JSON.stringify(r);
+	return r;
 }
 converters["position_xyzw"] = function(view)
 {
@@ -98,28 +101,36 @@ converters["position_xyzw"] = function(view)
 	r[1] = view.getFloat32(4, true);
 	r[2] = view.getFloat32(8, true);
 	r[3] = view.getFloat32(12, true);
-	return JSON.stringify(r);
+	return r;
 }
 
 
-//https://www.hardill.me.uk/wordpress/2014/08/29/unpacking-binary-data-from-mqtt-in-javascript/
-function fluff(payload)
+
+function plotter(archetypes)
 {
-	var buffer = new ArrayBuffer(payload.length);
-	uint = new Uint8Array(buffer);
-	for (var i=0; i < payload.length; i++)
+
+	var traces = [];
+
+	for (archetype in archetypes)
 	{
-		uint[i] = payload[i];
+		var components = archetypes[archetype].components;
+		for (component in components)
+		{
+			let cell = components[component]._cell;
+			if (cell.classList.contains("selected"))
+			{
+				var trace = 
+				{
+					y: [1,2,3],
+					mode: 'lines',
+					line: {color: '#80CAF6'}
+				};
+				traces.push(trace);
+			}
+		}
 	}
-	return uint;
-}
-
-
-
-
-function plotter(quantity, value)
-{
-
+	//https://plotly.com/javascript/streaming/
+	Plotly.newPlot('myDiv', traces);
 }
 
 
@@ -135,7 +146,8 @@ function show_archetypes()
 
 
 	var etable = document.getElementById("table");
-	req_json('doors', (archetypes) => 
+
+	req_json('archetypes', (archetypes) => 
 	{
 		generate_htmltable_archetypes(etable, archetypes);
 		console.log(archetypes);
@@ -145,35 +157,55 @@ function show_archetypes()
 			client.subscribe(topic);
 		}
 
-		for (name in archetypes)
+
+		for (archetype in archetypes)
 		{
-			var layouts = archetypes[name].layouts;
-			for (component in layouts)
+			var components = archetypes[archetype].components;
+			for (component in components)
 			{
-				let cell = layouts[component]._cell;
+				let cell = components[component]._cell;
 				cell.onclick = () => 
 				{
 					cell.classList.toggle("selected");
+					plotter(archetypes);
 				}
 			}
 		}
 
 		client.on("message", function (topic, payload)
 		{
+			var valuesy = [];
+			var values0 = [];
 			console.log(payload);
 			//console.log(fluff(payload));
 			//dataview = new DataView(fluff(payload).buffer);
-			var layouts = archetypes[topic].layouts;
-			for (component in layouts)
+			var components = archetypes[topic].components;
+			for (component in components)
 			{
 				//Warning! The payload does not start at byte 0!
-				dataview = new DataView(payload.buffer, payload.byteOffset + layouts[component].offset);
+				dataview = new DataView(payload.buffer, payload.byteOffset + components[component].offset);
 				var s = converters[component](dataview);
-				var cell = layouts[component]._cell;
-				cell.innerHTML = s;
+				var cell = components[component]._cell;
+				cell.innerHTML = JSON.stringify(s);
+				if (cell.classList.contains("selected"))
+				{
+					Plotly.extendTraces('myDiv', {y: [[s]]}, [0]);
+					//valuesy.push([s]);
+					//valuesy.push([s]);
+				}
 			}
+
+
+
+
 		});
 
 	});
 }
+
+
+
+
+
+
 </script>

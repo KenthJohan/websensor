@@ -31,17 +31,19 @@ using MQTTnet.Formatter;
 namespace demo1
 {
 
-	public class Layout
+	public class Archetype_Component
 	{
+		public string quantity { get; set; }
 		public int offset { get; set; }
 		public int size { get; set; }
 		public int n { get; set; }
-		public string quantity { get; set; }
+		public string endian { get; set; }
 	}
 
-	public class Door
+	public class Archetype
 	{
-		public Dictionary<string,Layout> layouts { get; set; }
+		public string path { get; set; }
+		public Dictionary<string,Archetype_Component> components { get; set; }
 	}
 
 	public class Demo_Controller : Controller
@@ -78,22 +80,23 @@ namespace demo1
 			return Content(s, "application/json");
 		}
 
-		[HttpGet("/doors")]
-		public async Task<IActionResult> doors()
+		[HttpGet("/archetypes")]
+		public async Task<IActionResult> archetypes()
 		{
-			Dictionary<string,Door> doors = new Dictionary<string,Door>();
+			Dictionary<string,Archetype> archetypes = new Dictionary<string,Archetype>();
 			string path = Path.Combine(Directory.GetCurrentDirectory(), "data");
 			List<string> names = new List<string>(Directory.EnumerateFiles(path, "*.json"));
 			for (var i = 0; i < names.Count; ++i)
 			{
-				Door door = new Door();
-				string name = Path.GetFileNameWithoutExtension(names[i]);
+				Archetype archetype = new Archetype();
+				archetype.path = names[i];
 				string content = System.IO.File.ReadAllText(names[i]);
-				door.layouts = JsonSerializer.Deserialize<Dictionary<string,Layout>>(content);
-				doors[name] = door;
+				archetype.components = JsonSerializer.Deserialize<Dictionary<string,Archetype_Component>>(content);
+				string archetype_name = Path.GetFileNameWithoutExtension(names[i]);
+				archetypes[archetype_name] = archetype;
 				//Console.WriteLine(names[i]);
 			}
-			string s = JsonSerializer.Serialize<Dictionary<string,Door>>(doors);
+			string s = JsonSerializer.Serialize<Dictionary<string,Archetype>>(archetypes);
 			return Content(s, "application/json");
 		}
 
