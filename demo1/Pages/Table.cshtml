@@ -1,18 +1,25 @@
 @page "/Table"
-<h1>Table</h1>
+<h1>Series</h1>
 
-<button onclick="show_archetypes()">show_archetypes</button>
+<button onclick="show_archetypes()">Show series</button>
+<button onclick="new_plotter_window()" id="plotbutton">New plotter window</button>
+<a id="plotlink" href="" target="_blank">Plotter</a>
 <hr>
 <table id="table"></table>
-<div id="myDiv"></div>
 
 <script>
 
+var plotlink_href = "";
 
-function hej(name, j)
+function new_plotter_window()
 {
-	console.log(name, j);
+	w = 800;
+	h = 600;
+	x = 400;
+	y = 400;
+	window.open(plotlink_href,"Plotter:"+plotlink_href,"resizable=no,toolbar=no,scrollbars=no,menubar=no,status=no,directories=n o,width="+w+",height="+h+",left="+x+",top="+y+"");
 }
+
 
 function generate_htmltable_archetypes(etable, archetypes)
 {
@@ -20,7 +27,9 @@ function generate_htmltable_archetypes(etable, archetypes)
 	var row;
 	row = etable.insertRow(-1);
 	cell = row.insertCell(-1);
-	cell.innerHTML = "name";
+	cell.innerHTML = "series";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "component";
 	cell = row.insertCell(-1);
 	cell.innerHTML = "quantity";
 	cell = row.insertCell(-1);
@@ -43,8 +52,11 @@ function generate_htmltable_archetypes(etable, archetypes)
 			cell = row.insertCell(-1);
 			cell.innerHTML = archetype;
 			cell = row.insertCell(-1);
+			cell.innerHTML = j;
+			cell = row.insertCell(-1);
 			cell.innerHTML = components[j].quantity;
 			cell.classList.add(components[j].quantity);
+			components[j]._color = window.getComputedStyle(cell ,null).getPropertyValue('background-color');
 			cell = row.insertCell(-1);
 			cell.innerHTML = components[j].n;
 			cell = row.insertCell(-1);
@@ -55,7 +67,6 @@ function generate_htmltable_archetypes(etable, archetypes)
 			cell.innerHTML = components[j].endian;
 			cell = row.insertCell(-1);
 			cell.innerHTML = 0;
-			cell.classList.add(components[j].quantity);
 			components[j]._cell = cell;
 			/*
 			cell.onclick = () => 
@@ -68,50 +79,24 @@ function generate_htmltable_archetypes(etable, archetypes)
 	//var row = etable.insertRow(0);
 }
 
-
-var converters = {};
-converters["timestamp"] = function(view)
-{
-	var r;
-	r = view.getFloat64(0, true);
-	return r;
-}
-converters["position_gcs"] = function(view)
-{
-	var r = [];
-	r[0] = view.getFloat32(0, true);
-	r[1] = view.getFloat32(4, true);
-	return r;
-}
-converters["temperature"] = function(view)
-{
-	var r;
-	r = view.getFloat32(0, true);
-	return r;
-}
-converters["humidity"] = function(view)
-{
-	var r;
-	r = view.getFloat32(0, true);
-	return r;
-}
-converters["position_xyzw"] = function(view)
-{
-	var r = [];
-	r[0] = view.getFloat32(0, true);
-	r[1] = view.getFloat32(4, true);
-	r[2] = view.getFloat32(8, true);
-	r[3] = view.getFloat32(12, true);
-	return r;
-}
+var etable = document.getElementById("table");
+var plotbutton = document.getElementById("plotbutton");
+plotbutton.disabled = true;
+//var plotlink = document.getElementById("plotlink");
 
 
 
-function plotter(archetypes)
-{
 
-	var traces = [];
-	var traceindex = 0;
+var client = mqtt.connect("ws://192.168.1.195:1884");
+client.on('connect', function () 
+{
+	console.log("mqtt connected");
+});
+
+
+function generate_url(archetypes)
+{
+	var selected = {};
 	for (archetype in archetypes)
 	{
 		var components = archetypes[archetype].components;
@@ -120,45 +105,44 @@ function plotter(archetypes)
 			let cell = components[component]._cell;
 			if (cell.classList.contains("selected"))
 			{
-				var bg = window.getComputedStyle( cell ,null).getPropertyValue('background-color');
-				console.log(bg);
-				components[component]._traceindex = traceindex;
-				traceindex++;
-				var trace = 
+				if (archetype in selected === false)
 				{
-					y: [],
-					mode: 'lines',
-					line: {color: bg}
-				};
-				traces.push(trace);
+					selected[archetype] = [];
+				}
+				selected[archetype].push(component);
 			}
 		}
 	}
-	//https://plotly.com/javascript/streaming/
-	Plotly.newPlot('myDiv', traces);
+	console.log(selected);
+	//console.log(t);
+	//console.log(atob(decodeURIComponent(t)));
+	if (Object.keys(selected).length > 0)
+	{
+		plotbutton.disabled = false;
+		var s = JSON.stringify(selected);
+		var t = encodeURIComponent(btoa(s));
+		plotlink_href = "/Plotter#"+t;
+	}
+	else
+	{
+		plotbutton.disabled = true;
+	}
 }
-
 
 function show_archetypes()
 {
-	var client = mqtt.connect("ws://192.168.1.195:1884");
-	client.on('connect', function () 
-	{
-		console.log("mqtt connected");
-	});
-
-	var etable = document.getElementById("table");
-
 	req_json('archetypes', (archetypes) => 
 	{
 		generate_htmltable_archetypes(etable, archetypes);
-		console.log(archetypes);
+		//console.log(archetypes);
+
 		for (topic in archetypes)
 		{
 			console.log("subscribe: " + topic);
 			client.subscribe(topic);
 		}
-
+		
+		var selected = {};
 
 		for (archetype in archetypes)
 		{
@@ -169,18 +153,16 @@ function show_archetypes()
 				cell.onclick = () => 
 				{
 					cell.classList.toggle("selected");
-					plotter(archetypes);
+					generate_url(archetypes);
 				}
 			}
 		}
 
+
+
 		client.on("message", function (topic, payload)
 		{
-			var traceval = [];
-			var traceidx = [];
-			console.log(payload);
-			//console.log(fluff(payload));
-			//dataview = new DataView(fluff(payload).buffer);
+			//console.log(payload);
 			var components = archetypes[topic].components;
 			for (component in components)
 			{
@@ -189,18 +171,6 @@ function show_archetypes()
 				var s = converters[component](dataview);
 				var cell = components[component]._cell;
 				cell.innerHTML = JSON.stringify(s);
-				if (cell.classList.contains("selected"))
-				{
-					traceval.push([s]);
-					traceidx.push(components[component]._traceindex);
-					//valuesy.push([s]);
-					//valuesy.push([s]);
-				}
-				if (traceval.length > 0)
-				{
-					console.log(traceval, traceidx);
-					Plotly.extendTraces('myDiv', {y: traceval}, traceidx);
-				}
 			}
 		});
 	});

@@ -89,3 +89,50 @@ function req_json(filename, callback)
 
 
 
+var quantity1dims = ["humidity", "temperature"];
+
+
+var converters = {};
+converters["timestamp"] = function(view)
+{
+	var r;
+	r = view.getFloat64(0, true);
+	return r;
+}
+converters["position_gcs"] = function(view)
+{
+	var r = [];
+	r[0] = view.getFloat32(0, true);
+	r[1] = view.getFloat32(4, true);
+	return r;
+}
+converters["temperature"] = function(view)
+{
+	var r;
+	r = view.getFloat32(0, true);
+	return r;
+}
+converters["humidity"] = function(view)
+{
+	var r;
+	r = view.getFloat32(0, true);
+	return r;
+}
+converters["position_xyzw"] = function(view)
+{
+	var r = [];
+	r[0] = view.getFloat32(0, true);
+	r[1] = view.getFloat32(4, true);
+	r[2] = view.getFloat32(8, true);
+	r[3] = view.getFloat32(12, true);
+	return r;
+}
+
+var colors = 
+{
+	"timestamp":"rgb(150, 160, 221)",
+	"position_xyzw":"rgb(212, 150, 202)",
+	"position_gcs":"rgb(143, 211, 169)",
+	"temperature":"rgb(255, 151, 151)",
+	"humidity":"rgb(174, 252, 255)"
+};

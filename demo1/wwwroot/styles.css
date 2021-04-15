@@ -84,5 +84,5 @@ td
 
 .selected
 {
-	font-style: italic;
+	background-color: rgb(255, 252, 80);
 }
