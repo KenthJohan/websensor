@@ -1,16 +1,23 @@
-@page "/Plotter"
-<h1>Plotter</h1>
+<!DOCTYPE html>
 
-<hr>
-<!-- 
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width" />
+	<title></title>
+	<link rel="stylesheet" href="styles.css">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+	<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+	<script src='scripts.js'></script>
+</head>
+
+<body style="margin: 0px;">
+
 <div id="myDiv"></div>
---> 
-<div id="myDiv" style="width: 600px; height: 400px;"></div>
-
-
 
 <script>
-
 
 var showthis = 
 {
@@ -32,6 +39,12 @@ else
 }
 
 
+
+var client = mqtt.connect("ws://192.168.1.195:1884");
+client.on('connect', function () 
+{
+	console.log("mqtt connected");
+});
 
 
 function newplotter(archetypes)
@@ -79,22 +92,19 @@ function newplotter(archetypes)
 			}
 		}
 	}
-	var layout = {showlegend: true};
+	var layout = 
+	{
+		showlegend: true,
+		autosize: true,
+		title: 'Plottington',
+  		font: {size: 18},
+		width:800
+	};
+	var config = {responsive: true}
 	//https://plotly.com/javascript/streaming/
-	Plotly.newPlot('myDiv', traces, layout);
+	Plotly.newPlot('myDiv', traces, layout,config);
 }
 
-
-
-
-
-
-
-var client = mqtt.connect("ws://192.168.1.195:1884");
-client.on('connect', function () 
-{
-	console.log("mqtt connected");
-});
 
 
 
@@ -181,3 +191,7 @@ req_json('archetypes', (archetypes) =>
 
 
 </script>
+
+</body>
+
+</html>

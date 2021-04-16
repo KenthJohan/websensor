@@ -136,3 +136,74 @@ var colors =
 	"temperature":"rgb(255, 151, 151)",
 	"humidity":"rgb(174, 252, 255)"
 };
+
+
+
+
+function generate_htmltable_archetypes(etable, archetypes)
+{
+	var cell;
+	var row;
+	row = etable.insertRow(-1);
+	cell = row.insertCell(-1);
+	cell.innerHTML = "series";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "component";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "quantity";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "n";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "offset";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "size";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "endian";
+	cell = row.insertCell(-1);
+	cell.innerHTML = "value";
+	for (let archetype in archetypes)
+	{
+		var components = archetypes[archetype].components;
+		//console.log(i);
+		for (let j in components)
+		{
+			row = etable.insertRow(-1);
+			cell = row.insertCell(-1);
+			cell.innerHTML = archetype;
+			cell = row.insertCell(-1);
+			cell.innerHTML = j;
+			cell = row.insertCell(-1);
+			cell.innerHTML = components[j].quantity;
+			cell.classList.add(components[j].quantity);
+			components[j]._color = window.getComputedStyle(cell ,null).getPropertyValue('background-color');
+			cell = row.insertCell(-1);
+			cell.innerHTML = components[j].n;
+			cell = row.insertCell(-1);
+			cell.innerHTML = components[j].offset;
+			cell = row.insertCell(-1);
+			cell.innerHTML = components[j].size;
+			cell = row.insertCell(-1);
+			cell.innerHTML = components[j].endian;
+			cell = row.insertCell(-1);
+			cell.innerHTML = 0;
+			components[j]._cell = cell;
+			/*
+			cell.onclick = () => 
+			{
+				hej(name, j);
+			}
+			*/
+		}
+	}
+	//var row = etable.insertRow(0);
+}
+
+
+
+
+
+
+
+
+
+
