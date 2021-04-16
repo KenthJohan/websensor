@@ -3,6 +3,7 @@
 
 <button onclick="show_archetypes()">Show series</button>
 <button onclick="new_plotter_window()" id="plotbutton">New plotter window</button>
+<button onclick="new_osm_window()" id="osmbutton">New OSM window</button>
 <hr>
 <table id="table"></table>
 
@@ -16,8 +17,18 @@ function new_plotter_window()
 	h = 400;
 	x = 400;
 	y = 400;
-	window.open(plotlink_href,"Plotter:"+plotlink_href,"resizable=no,toolbar=no,scrollbars=no,menubar=no,status=no,directories=n o,width="+w+",height="+h+",left="+x+",top="+y+"");
+	window.open("/plotter.html" + plotlink_href,"Plotter:"+plotlink_href,"resizable=no,toolbar=no,scrollbars=no,menubar=no,status=no,directories=n o,width="+w+",height="+h+",left="+x+",top="+y+"");
 }
+
+function new_osm_window()
+{
+	w = 800;
+	h = 400;
+	x = 400;
+	y = 400;
+	window.open("/osm.html" + plotlink_href,"Plotter:"+plotlink_href,"resizable=no,toolbar=no,scrollbars=no,menubar=no,status=no,directories=n o,width="+w+",height="+h+",left="+x+",top="+y+"");
+}
+
 
 
 
@@ -64,7 +75,7 @@ function generate_url(archetypes)
 		plotbutton.disabled = false;
 		var s = JSON.stringify(selected);
 		var t = encodeURIComponent(btoa(s));
-		plotlink_href = "/plotter.html#"+t;
+		plotlink_href = "#"+t;
 	}
 	else
 	{

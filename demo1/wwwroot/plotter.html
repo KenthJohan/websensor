@@ -17,6 +17,12 @@
 
 <div id="myDiv"></div>
 
+
+
+
+
+
+
 <script>
 
 var showthis = 
@@ -111,22 +117,7 @@ function newplotter(archetypes)
 
 req_json('archetypes', (archetypes) => 
 {
-	for (archetype in archetypes)
-	{
-		if (showthis[archetype] == null)
-		{
-			delete archetypes[archetype];
-			continue;
-		}
-		var components = archetypes[archetype].components;
-		for (component in components)
-		{
-			if (showthis[archetype].includes(component) == false)
-			{
-				delete components[component];
-			}
-		}
-	}
+	series_filter(archetypes, showthis);
 	console.log("archetypes", archetypes);
 
 	newplotter(archetypes);
@@ -191,7 +182,5 @@ req_json('archetypes', (archetypes) =>
 
 
 </script>
-
 </body>
-
 </html>

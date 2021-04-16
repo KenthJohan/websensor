@@ -207,3 +207,22 @@ function generate_htmltable_archetypes(etable, archetypes)
 
 
 
+function series_filter(series, filter)
+{
+	for (s in series)
+	{
+		if (filter[s] == null)
+		{
+			delete series[s];
+			continue;
+		}
+		var components = series[s].components;
+		for (c in components)
+		{
+			if (filter[s].includes(c) == false)
+			{
+				delete components[c];
+			}
+		}
+	}
+}
