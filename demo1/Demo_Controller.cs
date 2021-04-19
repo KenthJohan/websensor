@@ -80,8 +80,8 @@ namespace demo1
 			return Content(s, "application/json");
 		}
 
-		[HttpGet("/archetypes")]
-		public async Task<IActionResult> archetypes()
+		[HttpGet("/api/series")]
+		public async Task<IActionResult> series()
 		{
 			Dictionary<string,Archetype> archetypes = new Dictionary<string,Archetype>();
 			string path = Path.Combine(Directory.GetCurrentDirectory(), "data");

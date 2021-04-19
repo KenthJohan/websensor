@@ -1,6 +1,11 @@
 //http://www.davejennifer.com/computerjunk/javascript/tail-dash-f.html
 
 
+var mqtt_server_host = "ws://192.168.1.195:1884";
+
+
+
+
 function swap32(val)
 {
 	return ((val & 0xFF) << 24)
@@ -128,19 +133,36 @@ converters["position_xyzw"] = function(view)
 	return r;
 }
 
+
+function convert_payload(components, compname, payload)
+{
+	//Warning! The payload does not start at byte 0!
+	dataview = new DataView(payload.buffer, payload.byteOffset + components[compname].offset);
+	return converters[compname](dataview);
+}
+
+
+
+
+
+
+
+
+
+
 var colors = 
 {
 	"timestamp":"rgb(150, 160, 221)",
 	"position_xyzw":"rgb(212, 150, 202)",
 	"position_gcs":"rgb(143, 211, 169)",
 	"temperature":"rgb(255, 151, 151)",
-	"humidity":"rgb(174, 252, 255)"
+	"humidity":"rgb(134, 161, 192)"
 };
 
 
 
 
-function generate_htmltable_archetypes(etable, archetypes)
+function generate_htmltable_series(etable, archetypes)
 {
 	var cell;
 	var row;
@@ -174,8 +196,7 @@ function generate_htmltable_archetypes(etable, archetypes)
 			cell.innerHTML = j;
 			cell = row.insertCell(-1);
 			cell.innerHTML = components[j].quantity;
-			cell.classList.add(components[j].quantity);
-			components[j]._color = window.getComputedStyle(cell ,null).getPropertyValue('background-color');
+			cell.style.backgroundColor = colors[components[j].quantity];
 			cell = row.insertCell(-1);
 			cell.innerHTML = components[j].n;
 			cell = row.insertCell(-1);

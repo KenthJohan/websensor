@@ -3,6 +3,7 @@
 <html>
 
 <head>
+	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width" />
 	<title></title>
 	<link rel="stylesheet" href="styles.css">
@@ -46,22 +47,22 @@ else
 
 
 
-var client = mqtt.connect("ws://192.168.1.195:1884");
+var client = mqtt.connect(mqtt_server_host);
 client.on('connect', function () 
 {
 	console.log("mqtt connected");
 });
 
 
-function newplotter(archetypes)
+function newplotter(series)
 {
 	var traces = [];
 	var traceindex = 0;
 	var hastimestamp = false;
 
-	for (archetype in archetypes)
+	for (s in series)
 	{
-		var components = archetypes[archetype].components;
+		var components = series[s].components;
 		for (component in components)
 		{
 			if (component == "timestamp")
@@ -72,9 +73,9 @@ function newplotter(archetypes)
 	}
 
 
-	for (archetype in archetypes)
+	for (s in series)
 	{
-		var components = archetypes[archetype].components;
+		var components = series[s].components;
 		for (component in components)
 		{
 			let cell = components[component]._cell;
@@ -102,7 +103,7 @@ function newplotter(archetypes)
 	{
 		showlegend: true,
 		autosize: true,
-		title: 'Plottington',
+		title: 'Plot',
   		font: {size: 18},
 		width:800
 	};
@@ -115,15 +116,15 @@ function newplotter(archetypes)
 
 
 
-req_json('archetypes', (archetypes) => 
+req_json('api/series', (series) => 
 {
-	series_filter(archetypes, showthis);
-	console.log("archetypes", archetypes);
+	series_filter(series, showthis);
+	console.log("series", series);
 
-	newplotter(archetypes);
+	newplotter(series);
 
 	
-	for (topic in archetypes)
+	for (topic in series)
 	{
 		console.log("subscribe: " + topic);
 		client.subscribe(topic);
@@ -139,7 +140,7 @@ req_json('archetypes', (archetypes) =>
 		console.log(payload);
 		//console.log(fluff(payload));
 		//dataview = new DataView(fluff(payload).buffer);
-		var components = archetypes[topic].components;
+		var components = series[topic].components;
 		for (component in components)
 		{
 			//Warning! The payload does not start at byte 0!

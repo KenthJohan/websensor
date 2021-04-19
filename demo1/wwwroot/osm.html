@@ -34,11 +34,9 @@ var showthis =
 if(window.location.hash)
 {
 	var h = window.location.hash.substring(1);
-	console.log(h);
 	var k = atob(decodeURIComponent(h));
-	console.log(k);
 	showthis = JSON.parse(k);
-	console.log(showthis);
+	console.log(h, k, showthis);
 }
 else
 {
@@ -46,7 +44,7 @@ else
 }
 
 
-var client = mqtt.connect("ws://192.168.1.195:1884");
+var client = mqtt.connect(mqtt_server_host);
 client.on('connect', function () 
 {
 	console.log("mqtt connected");
@@ -87,14 +85,13 @@ function newmap(series)
 
 
 
-req_json('archetypes', (series) => 
+req_json('api/series', (series) => 
 {
 	series_filter(series, showthis);
 	console.log("series", series);
 	newmap(series);
 
 	var polyline = new L.Polyline([]).addTo(mymap);
-	
 
 	for (s in series)
 	{
@@ -104,17 +101,14 @@ req_json('archetypes', (series) =>
 	client.on("message", function (topic, payload)
 	{
 		var components = series[topic].components;
-		for (component in components)
+		for (c in components)
 		{
-			//Warning! The payload does not start at byte 0!
-			dataview = new DataView(payload.buffer, payload.byteOffset + components[component].offset);
-			var s = converters[component](dataview);
-			if (component == "position_gcs")
+			if (c == "position_gcs")
 			{
-				console.log(s);
-				polyline.addLatLng(s);
-				//L.polyline([s]).addTo(mymap);
-				mymap.setView(s);
+				var value = convert_payload(components, c, payload);
+				console.log(value);
+				polyline.addLatLng(value);
+				mymap.setView(value);
 			}
 		}
 	});

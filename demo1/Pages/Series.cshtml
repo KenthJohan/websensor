@@ -1,7 +1,7 @@
-@page "/Table"
+@page "/Series"
 <h1>Series</h1>
 
-<button onclick="show_archetypes()">Show series</button>
+<button onclick="show_series()">Show series</button>
 <button onclick="new_plotter_window()" id="plotbutton">New plotter window</button>
 <button onclick="new_osm_window()" id="osmbutton">New OSM window</button>
 <hr>
@@ -48,12 +48,12 @@ client.on('connect', function ()
 });
 
 
-function generate_url(archetypes)
+function generate_url(series)
 {
 	var selected = {};
-	for (archetype in archetypes)
+	for (archetype in series)
 	{
-		var components = archetypes[archetype].components;
+		var components = series[archetype].components;
 		for (component in components)
 		{
 			let cell = components[component]._cell;
@@ -83,14 +83,13 @@ function generate_url(archetypes)
 	}
 }
 
-function show_archetypes()
+function show_series()
 {
-	req_json('archetypes', (archetypes) => 
+	req_json('api/series', (series) => 
 	{
-		generate_htmltable_archetypes(etable, archetypes);
-		//console.log(archetypes);
+		generate_htmltable_series(etable, series);
 
-		for (topic in archetypes)
+		for (topic in series)
 		{
 			console.log("subscribe: " + topic);
 			client.subscribe(topic);
@@ -98,26 +97,24 @@ function show_archetypes()
 		
 		var selected = {};
 
-		for (archetype in archetypes)
+		for (archetype in series)
 		{
-			var components = archetypes[archetype].components;
+			var components = series[archetype].components;
 			for (component in components)
 			{
 				let cell = components[component]._cell;
 				cell.onclick = () => 
 				{
 					cell.classList.toggle("selected");
-					generate_url(archetypes);
+					generate_url(series);
 				}
 			}
 		}
 
-
-
 		client.on("message", function (topic, payload)
 		{
 			//console.log(payload);
-			var components = archetypes[topic].components;
+			var components = series[topic].components;
 			for (component in components)
 			{
 				//Warning! The payload does not start at byte 0!
