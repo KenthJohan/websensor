@@ -152,9 +152,9 @@ function convert_payload(components, compname, payload)
 
 var colors = 
 {
-	"timestamp":"rgb(150, 160, 221)",
+	"timestamp":"rgb(210, 210, 210)",
 	"position_xyzw":"rgb(212, 150, 202)",
-	"position_gcs":"rgb(143, 211, 169)",
+	"position_gcs":"rgb(160, 230, 190)",
 	"temperature":"rgb(255, 151, 151)",
 	"humidity":"rgb(134, 161, 192)"
 };
